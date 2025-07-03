@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Membuat Auto Scaling Group untuk menjalankan EC2 instance yang akan bergabung dengan ECS Cluster
+
+Resources:
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      # Subnet tempat EC2 instance akan diluncurkan.
+      # Ini menggunakan 2 subnet publik yang telah didefinisikan dan diexport sebelumnya.
+      VPCZoneIdentifier:
+        - !ImportValue PublicSubnet1Id
+        - !ImportValue PublicSubnet2Id
+
+      # Launch Template digunakan untuk mengatur konfigurasi instance (seperti AMI, instance type, security group, dsb.)
+      LaunchTemplate:
+        LaunchTemplateId: !ImportValue ECSLaunchTemplateId  # ID dari Launch Template yang telah dibuat sebelumnya
+        Version: !ImportValue ECSLaunchTemplateVersion # Gunakan versi terbaru dari Launch Template
+
+      # Konfigurasi jumlah instance yang dijalankan
+      MinSize: 1              # Jumlah minimum instance yang dijaga tetap aktif
+      MaxSize: 2              # Jumlah maksimum instance saat autoscaling
+      DesiredCapacity: 1      # Jumlah instance saat awal dijalankan
+
+      # Tag untuk menandai instance secara otomatis saat dibuat
+      Tags:
+        - Key: Name
+          Value: ECS-Instance
+          PropagateAtLaunch: true  # Pastikan tag ikut diterapkan ke instance saat diluncurkan

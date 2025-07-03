@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Task Definition untuk Launch Type EC2 (bukan Fargate)
+
+# Parameter untuk memudahkan pengaturan variabel dari luar file
+Parameters:
+  TaskFamily:
+    Type: String
+    Default: frontend-task
+    Description: Nama family untuk task ECS. ECS akan menyimpan versi-versinya.
+
+  ContainerName:
+    Type: String
+    Default: frontend-container
+    Description: Nama container dalam definisi ECS
+
+  ContainerImage:
+    Type: String
+    Description: Docker image yang akan dijalankan oleh container
+
+  ContainerPort:
+    Type: Number
+    Default: 80
+    Description: Port yang akan diekspose dari dalam container ke ECS instance
+
+  Cpu:
+    Type: Number
+    Description: Jumlah unit CPU (1024 = 1 vCPU)
+
+  Memory:
+    Type: Number
+    Description: Ukuran memory dalam MB
+
+Resources:
+  # Membuat ECS Task Definition
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref TaskFamily       # Nama family task (digunakan ECS untuk versi task)
+      
+      # NetworkMode "bridge" digunakan untuk ECS EC2 launch type (default ECS networking)
+      NetworkMode: bridge
+
+      # ECS container definition
+      ContainerDefinitions:
+        - Name: !Ref ContainerName      # Nama container
+          Image: !Ref ContainerImage    # Docker image yang digunakan
+          Cpu: !Ref Cpu
+          Memory: !Ref Memory
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80      # WAJIB 80 agar bisa langsung diakses dari browser
+              Protocol: tcp
+
+Outputs:
+  # Output berupa ARN dari task definition (bisa digunakan untuk ECS Service)
+  TaskDefinitionArn:
+    Description: ARN dari task definition ECS
+    Value: !Ref TaskDefinition
+    Export:
+      Name: TaskDefinitionArn

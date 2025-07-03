@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Launch Template untuk EC2 yang akan digunakan ECS Cluster
+
+Parameters:
+  ECSClusterName:
+    Type: String
+    Description: Nama ECS Cluster yang akan digunakan oleh EC2 instance
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    Description: Tipe EC2 instance untuk ECS
+
+  # Menggunakan AMI ECS Optimized dari AWS SSM Parameter Store
+  ECSAMI:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id
+    Description: ECS Optimized AMI
+
+Resources:
+  ECSLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: ecs-launch-template
+      LaunchTemplateData:
+        # Tipe EC2
+        InstanceType: !Ref InstanceType
+
+        # AMI ECS-Optimized dari AWS SSM Parameter Store
+        ImageId: !Ref ECSAMI
+
+        # Instance Profile agar EC2 bisa jalan sebagai ECS Agent
+        IamInstanceProfile:
+          Name: !ImportValue ECSInstanceProfile
+
+        # Security Group untuk mengizinkan HTTP, SSH dll
+        SecurityGroupIds:
+          - !ImportValue GlobalSecurityGroupId
+
+        # UserData agar EC2 langsung join ke ECS Cluster
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            echo ECS_CLUSTER=${ECSClusterName} >> /etc/ecs/ecs.config
+            
+Outputs:
+  ECSLaunchTemplateId:
+    Description: ID dari Launch Template untuk ECS
+    Value: !Ref ECSLaunchTemplate
+    Export:
+      Name: ECSLaunchTemplateId
+  ECSLaunchTemplateVersion:
+    Description: Versi terakhir dari Launch Template
+    Value: !GetAtt ECSLaunchTemplate.LatestVersionNumber
+    Export:
+      Name: ECSLaunchTemplateVersion

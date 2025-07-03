@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "ECSClusterName",
+    "ParameterValue": "frontend-cluster"
+  },
+  {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "t3.micro"
+  }
+]

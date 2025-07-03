@@ -1,0 +1,6 @@
+[
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "frontend-cluster"
+  }
+]

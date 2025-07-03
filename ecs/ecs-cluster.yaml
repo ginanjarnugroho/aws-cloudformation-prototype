@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Membuat ECS Cluster untuk menjalankan frontend container
+
+# Parameter agar nama cluster bisa dikustomisasi dari luar
+Parameters:
+  ClusterName:
+    Type: String
+    Default: frontend-cluster
+    Description: Nama ECS Cluster
+
+Resources:
+  # Membuat ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+
+Outputs:
+  # Output nama ECS Cluster agar bisa digunakan di stack lain (jika diperlukan)
+  ECSClusterName:
+    Description: Nama dari ECS Cluster yang berhasil dibuat
+    Value: !Ref ECSCluster
+    Export:
+      Name: ECSClusterName

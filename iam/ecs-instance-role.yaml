@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Membuat IAM Role untuk EC2 Instance agar bisa digunakan oleh ECS Agent
+
+Resources:
+  ECSInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecsInstanceRole
+      # Policy agar EC2 bisa diasumsikan sebagai ECS agent
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        # Policy AWS bawaan agar EC2 bisa digunakan oleh ECS
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+  ECSInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: ecsInstanceRole
+      Roles:
+        - !Ref ECSInstanceRole
+
+Outputs:
+  InstanceProfile:
+    Description: Instance Profile yang akan dipasang ke EC2 (Launch Template)
+    Value: !Ref ECSInstanceProfile
+    Export:
+      Name: ECSInstanceProfile

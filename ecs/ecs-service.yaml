@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Service untuk jalankan task dengan EC2 launch type
+
+Parameters:
+  ClusterName:
+    Type: String
+    Description: Nama ECS Cluster tempat service dijalankan
+
+  ServiceName:
+    Type: String
+    Default: frontend-service
+    Description: Nama ECS Service
+
+  DesiredCount:
+    Type: Number
+    Default: 1
+    Description: Jumlah task yang ingin dijalankan
+
+  TaskDefinitionArn:
+    Type: String
+    Description: Task Definition ARN (misalnya dari versi terbaru)
+
+Resources:
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ClusterName                 # Cluster ECS tempat service akan berjalan
+      ServiceName: !Ref ServiceName             # Nama ECS Service
+      DesiredCount: !Ref DesiredCount           # Jumlah task yang ingin dijalankan
+      LaunchType: EC2                           # Launch type EC2 (bukan Fargate)
+      TaskDefinition: !Ref TaskDefinitionArn    # Referensi ke Task Definition (ARN versi tertentu)
+      SchedulingStrategy: REPLICA               # Mode default: satu atau lebih task dijalankan
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+
+  ServiceScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: ECSService      # 👉 Menunggu ECSService selesai dibuat
+    Properties:
+      MaxCapacity: 4
+      MinCapacity: 1
+      ResourceId: !Sub "service/${ClusterName}/${ServiceName}"
+      RoleARN: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+
+  ServiceScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    DependsOn: ServiceScalingTarget   # 👉 Tunggu setelah target tersedia
+    Properties:
+      PolicyName: !Sub "${ServiceName}-cpu-scaling-policy"
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ServiceScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: 60.0
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
+
+Outputs:
+  ECSServiceName:
+    Value: !Ref ECSService
+    Export:
+      Name: ECSServiceName

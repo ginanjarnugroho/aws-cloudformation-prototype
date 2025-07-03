@@ -1,0 +1,18 @@
+[
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "frontend-cluster"
+  },
+  {
+    "ParameterKey": "ServiceName",
+    "ParameterValue": "frontend-service"
+  },
+  {
+    "ParameterKey": "DesiredCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "TaskDefinitionArn",
+    "ParameterValue": "arn:aws:ecs:ap-southeast-1:949341885480:task-definition/frontend-task:1"
+  }
+]

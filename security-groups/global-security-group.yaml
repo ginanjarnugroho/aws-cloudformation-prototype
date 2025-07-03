@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Standard Global Security Group for HTTP, HTTPS, and SSH
+
+Parameters:
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC where this Security Group will be used
+  SSHAllowedIP:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: IP allowed to SSH (use your IP for security, e.g., 123.123.123.123/32)
+
+Resources:
+  GlobalSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: global-standard-sg
+      GroupDescription: Allow HTTP, HTTPS, and SSH
+      VpcId: !Ref VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHAllowedIP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  GlobalSecurityGroupId:
+    Description: ID dari Global Security Group
+    Value: !Ref GlobalSecurityGroup
+    Export:
+      Name: GlobalSecurityGroupId

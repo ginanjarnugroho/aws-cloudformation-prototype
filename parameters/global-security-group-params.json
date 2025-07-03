@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "VPCID",
+    "ParameterValue": "vpc-xxxxxxxxxxxxxxxx"
+  },
+  {
+    "ParameterKey": "SSHAllowedIP",
+    "ParameterValue": "123.123.123.123/32"
+  }
+]

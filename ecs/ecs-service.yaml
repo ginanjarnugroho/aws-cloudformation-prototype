@@ -16,10 +16,6 @@ Parameters:
     Default: 1
     Description: Jumlah task yang ingin dijalankan
 
-  TaskDefinitionArn:
-    Type: String
-    Description: Task Definition ARN (misalnya dari versi terbaru)
-
 Resources:
   ECSService:
     Type: AWS::ECS::Service
@@ -28,7 +24,7 @@ Resources:
       ServiceName: !Ref ServiceName             # Nama ECS Service
       DesiredCount: !Ref DesiredCount           # Jumlah task yang ingin dijalankan
       LaunchType: EC2                           # Launch type EC2 (bukan Fargate)
-      TaskDefinition: !Ref TaskDefinitionArn    # Referensi ke Task Definition (ARN versi tertentu)
+      TaskDefinition: !ImportValue TaskDefinitionArn    # Referensi ke Task Definition (ARN versi tertentu)
       SchedulingStrategy: REPLICA               # Mode default: satu atau lebih task dijalankan
       DeploymentConfiguration:
         MaximumPercent: 200

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 STACK_NAME=vpc-stack
-TEMPLATE_FILE=templates/vpc.yaml
+TEMPLATE_FILE=vpc/vpc.yaml
 PARAMS_FILE=parameters/vpc-params.json
 REGION=ap-southeast-1
 

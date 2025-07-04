@@ -9,7 +9,7 @@
   },
   {
     "ParameterKey": "ContainerImage",
-    "ParameterValue": "nginx:latest"
+    "ParameterValue": "949341885480.dkr.ecr.ap-southeast-1.amazonaws.com/app-frontend-repo:latest"
   },
   {
     "ParameterKey": "ContainerPort",

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 STACK_NAME=ecs-cluster-stack
-TEMPLATE_FILE=templates/ecs-cluster.yaml
+TEMPLATE_FILE=ecs/ecs-cluster.yaml
 PARAMS_FILE=parameters/ecs-cluster-params.json
 REGION=ap-southeast-1
 
